@@ -9,6 +9,38 @@ El objetivo es aprovechar el poder de la optimización evolutiva para encontrar 
 
 ### 🔹 FeatureSelection
 Implementa un algoritmo genético para seleccionar el subconjunto óptimo de características, buscando un balance entre rendimiento del modelo y reducción de dimensionalidad.
+Este módulo implementa un algoritmo Genético (GA) para la selección de características en datasets de alta dimensionalidad.
+El objetivo es encontrar un subconjunto óptimo de features que maximice el rendimiento de los modelos mientras se minimiza la complejidad (número de variables).
+✅ Ejemplo de uso:
+```python
+from feature_selection import GeneticFeatureSelector
+import pandas as pd
+
+# Cargar dataset Santander
+data = pd.read_csv("archive/santander.csv")
+X = data.drop(["target", "ID_code"], axis=1)
+y = data["target"]
+
+# Crear selector genético
+selector = GeneticFeatureSelector(
+    models=["rf", "xgb", "mlp", "svm", "lr"],
+    population_size=20,
+    generations=10,
+    mutation_rate=0.1,
+    alpha=0.05
+)
+
+# Ejecutar el proceso
+results = selector.run(X, y)
+
+# Exportar resultados
+selector.save_results("results_feature_selection.csv")
+
+# Visualización comparativa
+selector.plot_results()
+```
+
+
 
 ### 🔹 HyperparameterOptimizer
 Un optimizador de hiperparámetros basado en algoritmos genéticos que permite:
