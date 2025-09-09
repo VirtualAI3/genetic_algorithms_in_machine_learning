@@ -12,6 +12,8 @@ Implementa un algoritmo genético para seleccionar el subconjunto óptimo de car
 
 Este módulo implementa un algoritmo Genético (GA) para la selección de características en datasets de alta dimensionalidad.
 
+Usa Random Forest, XGBoost, MLP, LightGBM y Logistic Regression.
+
 El objetivo es encontrar un subconjunto óptimo de features que maximice el rendimiento de los modelos mientras se minimiza la complejidad (número de variables).
 ✅ Ejemplo de uso:
 ```python
