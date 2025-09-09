@@ -4,11 +4,13 @@ from typing import List, Tuple, Callable
 
 class GeneticAlgorithm:
     def __init__(self, population_size: int = 50, generations: int = 100, 
-                 mutation_rate: float = 0.1, crossover_rate: float = 0.8):
+                 mutation_rate: float = 0.1, crossover_rate: float = 0.8,
+                 elitism_size: int = 2):
         self.population_size = population_size
         self.generations = generations
         self.mutation_rate = mutation_rate
         self.crossover_rate = crossover_rate
+        self.elitism_size = elitism_size
         self.best_individual = None
         self.best_fitness = float('-inf')
         self.fitness_history_generation = []  # Fitness de cada generación
@@ -143,15 +145,23 @@ class GeneticAlgorithm:
                     'params': ind,
                     'fitness': fitness_scores[idx]
                 })
-
-            self.generation_details.append(generation_info)
-
-            print(f"Generación {generation}: Mejor fitness = {self.best_fitness:.4f}, "
-                    f"Promedio = {avg_fitness:.4f}")
             
             new_population = []
-            best_idx = np.argmax(fitness_scores)
-            new_population.append(population[best_idx].copy())
+            #best_idx = np.argmax(fitness_scores)
+            #new_population.append(population[best_idx].copy())
+
+            elite_indices = np.argsort(fitness_scores)[-self.elitism_size:][::-1]
+            
+            generation_info["elite_individuals"] = [
+                {"individual_id": idx, "params": population[idx], "fitness": fitness_scores[idx]}
+                for idx in elite_indices
+            ]
+            
+            self.generation_details.append(generation_info)
+            self.print_generation_summary(generation)
+            
+            for idx in elite_indices:
+                new_population.append(population[idx].copy())
 
             while len(new_population) < self.population_size:
                 parent1 = self.tournament_selection(population, fitness_scores)
@@ -179,6 +189,8 @@ class GeneticAlgorithm:
             return
         
         gen_data = self.generation_details[generation_num]
+        elite_list = gen_data.get("elite_individuals", [])
+        
         print(f"\n{'='*60}")
         print(f"GENERACIÓN {generation_num}")
         print(f"{'='*60}")
@@ -186,9 +198,22 @@ class GeneticAlgorithm:
         print(f"Fitness promedio: {gen_data['avg_fitness']:.4f} ± {gen_data['std_fitness']:.4f}")
         print(f"Rango fitness: [{gen_data['min_fitness']:.4f}, {gen_data['max_fitness']:.4f}]")
         
-        print(f"\nTOP {top_n} INDIVIDUOS:")
+        print(f"\nINDIVIDUOS ELITISTAS")
         print("-" * 80)
-        for i, ind in enumerate(gen_data['individuals'][:top_n]):
+        for i, elite in enumerate(elite_list):
+            print(f"#{i+1} (ID: {elite['individual_id']}) - Fitness: {elite['fitness']:.4f}")
+            print(f"    Parámetros: {elite['params']}")
+        
+        top_individuals = sorted(
+            gen_data['individuals'],
+            key=lambda x: x['fitness'],
+            reverse=True
+        )[:top_n]
+        
+        print(f"\nTOP {top_n} INDIVIDUOS:") 
+        print("-" * 80)
+
+        for i, ind in enumerate(top_individuals):
             print(f"#{i+1} (ID: {ind['individual_id']}) - Fitness: {ind['fitness']:.4f}")
             print(f"    Parámetros: {ind['params']}")
     

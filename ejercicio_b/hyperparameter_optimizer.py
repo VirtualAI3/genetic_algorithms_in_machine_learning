@@ -8,7 +8,8 @@ class HyperparameterOptimizer:
     def __init__(self, model_class, X, y, param_ranges: dict, 
                  scoring: Any = 'accuracy', cv_folds: int = 5,
                  population_size: int = 50, generations: int = 100,
-                 mutation_rate: float = 0.1, crossover_rate: float = 0.8):
+                 mutation_rate: float = 0.1, crossover_rate: float = 0.8,
+                 fixed_params: dict = None):
         """
         Optimizador de hiperparámetros usando algoritmos genéticos
         
@@ -26,6 +27,7 @@ class HyperparameterOptimizer:
         self.param_ranges = param_ranges
         self.scoring = scoring
         self.cv_folds = cv_folds
+        self.fixed_params = fixed_params if fixed_params is not None else {}
         
         # Inicializar algoritmo genético
         self.ga = GeneticAlgorithm(
@@ -36,21 +38,18 @@ class HyperparameterOptimizer:
         )
     
     def fitness_function(self, params: dict) -> float:
-        """
-        Función de fitness que evalúa un conjunto de parámetros.
-        Si self.scoring es un string -> usa esa métrica.
-        Si es un diccionario -> combina varias métricas con pesos.
-        """
+        """Evalúa un conjunto de parámetros con cross-validation"""
         try:
-            model = self.model_class(**params)
+            # Combinar parámetros explorados + fijos
+            full_params = {**self.fixed_params, **params}
+            model = self.model_class(**full_params)
+
             cv = StratifiedKFold(n_splits=self.cv_folds, shuffle=True, random_state=42)
 
-            # Caso 1: métrica única (string)
             if isinstance(self.scoring, str):
                 cv_scores = cross_val_score(model, self.X, self.y, cv=cv, scoring=self.scoring)
                 return np.mean(cv_scores)
 
-            # Caso 2: múltiples métricas con pesos
             elif isinstance(self.scoring, dict):
                 total_score = 0.0
                 for metric_name, (metric_func, weight) in self.scoring.items():
