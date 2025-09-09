@@ -46,5 +46,5 @@ optimizer = HyperparameterOptimizer(
 
 best_params = optimizer.optimize()
 results = optimizer.evaluate_best_model(X_test, y_test)
-
-# NeuronEvolution
+````
+### 🔹 NeuronEvolution
