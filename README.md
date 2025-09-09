@@ -85,3 +85,31 @@ best_params = optimizer.optimize()
 results = optimizer.evaluate_best_model(X_test, y_test)
 ````
 ### 🔹 NeuronEvolution
+Implementa un algoritmo genético para seleccionar la arquitectura óptima de una CNN sobre el dataset CIFAR-10.
+Busca un balance entre rendimiento (accuracy) y complejidad (número de capas).
+
+El módulo entrena y evalúa arquitecturas candidatas en un subconjunto reducido del dataset para acelerar la búsqueda, y al finalizar entrena el mejor modelo sobre todo el dataset y lo evalúa en el conjunto de test.
+
+Modelos generados: CNNs personalizadas con diferentes configuraciones de capas convolucionales, fully connected, activaciones y dropout.
+✅ Ejemplo de uso:
+```python
+from cnn_evolution import EvolvedCNNSelector
+
+# Crear el selector genético
+selector = EvolvedCNNSelector(
+    population_size=20,       # tamaño de la población
+    generations=12,           # número de generaciones
+    tournament_size=3,        # tamaño del torneo para selección
+    elitism=2,                # número de mejores individuos que pasan directo
+    crossover_prob=0.9,       # probabilidad de cruce
+    mutation_prob=0.3,        # probabilidad de mutación
+    eval_epochs=3,            # épocas rápidas para fitness
+    final_epochs=10,          # entrenamiento final del mejor modelo
+    device="cuda"             # "cuda" o "cpu"
+)
+
+# Ejecutar el proceso evolutivo en CIFAR-10
+best_model, test_acc = selector.run()
+
+print("Precisión final en test:", test_acc)
+````
