@@ -9,7 +9,9 @@ El objetivo es aprovechar el poder de la optimización evolutiva para encontrar 
 
 ### 🔹 FeatureSelection
 Implementa un algoritmo genético para seleccionar el subconjunto óptimo de características, buscando un balance entre rendimiento del modelo y reducción de dimensionalidad.
+
 Este módulo implementa un algoritmo Genético (GA) para la selección de características en datasets de alta dimensionalidad.
+
 El objetivo es encontrar un subconjunto óptimo de features que maximice el rendimiento de los modelos mientras se minimiza la complejidad (número de variables).
 ✅ Ejemplo de uso:
 ```python
